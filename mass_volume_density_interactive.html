@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mass, Volume & Density — Interactive Lab</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#203047;background:#f3f7fb}
+*{box-sizing:border-box}body{margin:0;padding:20px}
+main{max-width:850px;margin:auto;background:white;border:1px solid #d4e0ed;border-radius:18px;padding:22px;box-shadow:0 5px 20px #233b5210}
+h1{font-size:clamp(22px,4vw,30px);margin:0 0 5px} .intro{color:#52657c;margin:0 0 22px}
+.layout{display:grid;grid-template-columns:1.1fr .9fr 1fr;gap:20px;align-items:center}
+label{display:flex;justify-content:space-between;font-weight:700;gap:8px}
+.control{margin-bottom:30px}.control:last-child{margin-bottom:0}
+input[type=range]{width:100%;accent-color:#2583cf;margin:14px 0;cursor:pointer}
+.beaker{text-align:center}.beaker svg{width:100%;max-width:175px;height:auto;display:block;margin:auto}
+.calc{background:#edf5fc;border-radius:15px;text-align:center;padding:22px 8px;min-height:165px;display:flex;flex-direction:column;justify-content:center}
+.formula{font-weight:800;font-size:21px}.working{color:#56687a;margin:10px 0}
+.result{font-size:36px;font-weight:800;color:#145c9c;font-variant-numeric:tabular-nums}.unit{font-weight:700}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+button{border:1px solid #aac5dc;border-radius:9px;background:white;color:#1e537f;font-size:14px;padding:10px 13px;cursor:pointer;font-weight:700}
+button:hover,button:focus-visible{background:#e5f2fc}
+.note{margin:17px 0 0;color:#425a70;font-size:14px;line-height:1.5}
+@media(max-width:540px){main{padding:15px}.layout{grid-template-columns:1fr 1fr;gap:12px}.controls{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:14px}.control{margin:0!important}.calc{min-height:170px;padding:12px 4px}.result{font-size:29px}.formula{font-size:18px}}
+</style>
+</head>
+<body>
+<main>
+<h1>Explore Mass, Volume & Density</h1>
+<p class="intro">Move the sliders. Watch the liquid level and density change!</p>
+<div class="layout">
+<section class="controls" aria-label="Adjust mass and volume">
+<div class="control"><label for="mass">Mass <output id="massValue" for="mass">100 g</output></label>
+<input id="mass" type="range" min="20" max="200" step="5" value="100"></div>
+<div class="control"><label for="volume">Volume <output id="volumeValue" for="volume">10 mL</output></label>
+<input id="volume" type="range" min="5" max="100" step="1" value="10"></div>
+</section>
+<section class="beaker" aria-label="Graduated beaker displaying selected liquid volume">
+<svg viewBox="0 0 150 190" role="img" aria-labelledby="beakerTitle beakerDesc">
+<title id="beakerTitle">Graduated beaker</title>
+<desc id="beakerDesc">The blue liquid level changes when the volume slider moves.</desc>
+<defs><clipPath id="inside"><path d="M30 17 L120 17 L115 163 Q115 169 108 169 L42 169 Q35 169 35 163 Z"/></clipPath></defs>
+<path d="M30 17 L120 17 L115 163 Q115 169 108 169 L42 169 Q35 169 35 163 Z" fill="#f8fcff" stroke="#526578" stroke-width="2.5"/>
+<g clip-path="url(#inside)">
+<rect id="liquid" x="30" y="155.5" width="90" height="13.5" fill="#77c8f1" opacity=".9"/>
+<path id="surface" d="M30 155.5 Q53 152.5 75 155.5 T120 155.5" fill="none" stroke="#2499d5" stroke-width="2"/>
+</g>
+<g stroke="#475569" stroke-width="1.4" fill="#334155" font-size="10">
+<path d="M35 142 H50 M35 115 H50 M35 88 H50 M35 61 H50 M35 34 H50"/>
+<text x="53" y="146" stroke="none">20</text><text x="53" y="119" stroke="none">40</text>
+<text x="53" y="92" stroke="none">60</text><text x="53" y="65" stroke="none">80</text>
+<text x="53" y="38" stroke="none">100</text>
+</g><text x="75" y="186" text-anchor="middle" font-size="12" fill="#203047">mL</text>
+</svg>
+<strong id="beakerValue">10 mL</strong>
+</section>
+<section class="calc" aria-live="polite" aria-atomic="true">
+<div class="formula">D = M ÷ V</div>
+<div class="working" id="working">100 ÷ 10</div>
+<div class="result" id="density">10.0</div>
+<div class="unit">g/mL</div>
+</section>
+</div>
+<div class="actions">
+<button type="button" id="less">Less volume</button>
+<button type="button" id="more">More volume</button>
+<button type="button" id="reset">↺ Reset</button>
+</div>
+<p class="note"><strong>Try this:</strong> Keep mass at 100 g and increase volume. What happens to density?<br><strong>Remember:</strong> 1 mL = 1 cm³. This model illustrates the mathematical relationship; the blue liquid represents volume, not a physical change caused by adjusting mass.</p>
+</main>
+<script>
+const mass=document.getElementById('mass'),volume=document.getElementById('volume');
+function update(){
+ const m=Number(mass.value),v=Number(volume.value),y=169-v*1.35;
+ document.getElementById('massValue').textContent=m+' g';
+ document.getElementById('volumeValue').textContent=v+' mL';
+ document.getElementById('beakerValue').textContent=v+' mL';
+ document.getElementById('working').textContent=m+' ÷ '+v;
+ document.getElementById('density').textContent=(m/v).toFixed(1);
+ document.getElementById('liquid').setAttribute('y',y);
+ document.getElementById('liquid').setAttribute('height',v*1.35);
+ document.getElementById('surface').setAttribute('d',`M30 ${y} Q53 ${y-3} 75 ${y} T120 ${y}`);
+}
+mass.addEventListener('input',update);volume.addEventListener('input',update);
+document.getElementById('less').onclick=()=>{mass.value=100;volume.value=5;update()};
+document.getElementById('more').onclick=()=>{mass.value=100;volume.value=25;update()};
+document.getElementById('reset').onclick=()=>{mass.value=100;volume.value=10;update()};
+update();
+</script>
+</body></html>
